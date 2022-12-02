@@ -1,0 +1,14 @@
+(include "../library.dl")
+
+(defun part (part)
+  (println "------------------------------------------------------------------------------------------------------------")
+  (println "Part " part)
+  (println "------------------------------------------------------------------------------------------------------------"))
+
+(defun result (result)
+  (println "Result: " result))
+
+(var input (if release
+               (include "input")
+               (include "example")))
+(println "Input: " input)
