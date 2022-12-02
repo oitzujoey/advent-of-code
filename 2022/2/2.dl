@@ -1,0 +1,64 @@
+(var release true)
+
+(include "../library.dl")
+
+(println "------------------------------------------------------------------------------------------------------------")
+(println "Part 1")
+(println "------------------------------------------------------------------------------------------------------------")
+
+(var A 1)
+(var B 2)
+(var C 3)
+(var X 1)
+(var Y 2)
+(var Z 3)
+
+(var input (if release
+               (include "input")
+               (include "example")))
+(println "Input: " input)
+
+(defun pair-up (l)
+  (when (even? (length l))
+	(var nl ())
+	(while (not (null? l))
+		   (push (cons (first l) (second l)) nl)
+		   (to l (cddr)))
+	(nreverse nl)))
+
+(var input (pair-up input))
+(println "Paired: " input)
+
+(defun tictactoe (pair)
+  (var opponent (car pair))
+  (var me (cdr pair))
+  (var table (list (list 3 0 6)
+				   (list 6 3 0)
+				   (list 0 6 3)))
+  (var win (nth (1- opponent) (nth (1- me) table)))
+  (+ win me))
+
+(defun + (&rest values)
+  (var sum 0)
+  (while (not (null? values))
+            (to sum (+ (first values)))
+            (pop values))
+  sum)
+
+(println "Result: " (apply + (mapcar tictactoe input)))
+
+(println "------------------------------------------------------------------------------------------------------------")
+(println "Part 2")
+(println "------------------------------------------------------------------------------------------------------------")
+
+(defun tictactoe (pair)
+  (var opponent (car pair))
+  (var win (cdr pair))
+  (var table (list (list C A B)
+				   (list A B C)
+				   (list B C A)))
+  (var me (nth (1- opponent) (nth (1- win) table)))
+  (+ (* (- win 1) 3) me))
+(println (tictactoe (first input)))
+
+(println "Result: " (apply + (mapcar tictactoe input)))

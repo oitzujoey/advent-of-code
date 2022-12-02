@@ -1,0 +1,61 @@
+(var release true)
+
+(include "library.dl")
+
+(println "------------------------------------------------------------------------------------------------------------")
+(println "Part 1")
+(println "------------------------------------------------------------------------------------------------------------")
+
+(var input (if release
+               (include "input")
+               (include "example")))
+(println "Input: " input)
+
+(defmacro to (variable form)
+  (var function (car form))
+  (var args (cdr form))
+  (var subform (list function variable))
+  (set-cdr (cdr subform) args)
+  (list (quote setq) variable subform))
+
+(defmacro while-nn (condition &rest body)
+  "Expand (while-nn condition &rest body) into (while (not (null? condition)) &rest body)"
+  (var first-part (list (quote while) (list (quote not) (list (quote null?) condition))))
+  (set-cdr (cdr first-part) body)
+  first-part)
+
+(defun sum-number-blobs (input)
+  (var new-list ())
+  (while-nn input
+            (var form (first input))
+            (if (and (integer? form) (integer? (first new-list)))
+                (set-car new-list (+ form (car new-list)))
+                (push 0 new-list))
+            (pop input))
+  new-list)
+
+(var sums (sum-number-blobs input))
+(println "Choices: " sums)
+(var result1 (apply max sums))
+(println "Output: " result1)
+
+(println "------------------------------------------------------------------------------------------------------------")
+(println "Part 2")
+(println "------------------------------------------------------------------------------------------------------------")
+
+(defun max3 (&rest values)
+  (var sorted-values (sort-descending values))
+  (set-cdr (cddr sorted-values) ())
+  sorted-values)
+
+(defun + (&rest values)
+  (var sum 0)
+  (while-nn values
+            (to sum (+ (first values)))
+            (pop values))
+  sum)
+
+(var top3 (apply max3 sums))
+(println "Top 3: " top3)
+(var result2 (apply + top3))
+(println "Output: " result2)
