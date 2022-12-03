@@ -125,10 +125,16 @@
 (defun <= (x y)
   (not (> x y)))
 
+(defun != (x y)
+  (not (= x y)))
+
 (defun even? (value)
   (= 0 (- value (* (/ value 2) 2))))
 (defun odd? (value)
   (not (even? value)))
+
+(defun mod (a b)
+  (- a (* (/ a b) b)))
 
 (defun gcd (a b)
   (while (not (= a b))

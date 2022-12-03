@@ -1,5 +1,12 @@
 (include "../library.dl")
 
+(defun + (&rest values)
+  (var sum 0)
+  (while (not (null? values))
+            (to sum (+ (first values)))
+            (pop values))
+  sum)
+
 (defun part (part)
   (println "------------------------------------------------------------------------------------------------------------")
   (println "Part " part)
