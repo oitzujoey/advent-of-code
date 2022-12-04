@@ -1,0 +1,49 @@
+(var release true)
+
+(include "../aoclib.dl")
+
+(part 1)
+
+(var paired (mapcar (lambda (group)
+					  (var left (list (first group) (second group)))
+					  (var right (list (third group) (fourth group)))
+					  (list left right))
+					input))
+(setq input ())
+(println "Paired:")
+(mapcar (lambda (pair) (println (first pair) " " (second pair))) paired)
+
+(defun contains? (left right)
+  (defun left-contains-right? (left right)
+	(and (<= (first left) (first right))
+		 (>= (second left) (second right))))
+  (or (left-contains-right? left right)
+	  (left-contains-right? right left)))
+
+(var contains-list (mapcar (lambda (group)
+							 (var left (first group))
+							 (var right (second group))
+							 (contains? left right))
+						   paired))
+
+(result (apply + (mapcar (lambda (element) (if element 1 0)) contains-list)))
+
+
+(part 2)
+
+(defun overlaps? (left right)
+  (defun no-overlap (left right)
+	(or (< (second left) (first right))
+		(< (second right) (first left))))
+  (not (no-overlap left right)))
+
+(var overlaps-list (mapcar (lambda (group)
+							 (var left (first group))
+							 (var right (second group))
+							 (overlaps? left right))
+						   paired))
+
+(println "Overlaps:")
+(mapcar println overlaps-list)
+
+(result (apply + (mapcar (lambda (element) (if element 1 0)) overlaps-list)))
