@@ -95,8 +95,8 @@
 (defun print (&rest vs)
   (var vs2 vs)
   (while (not (null? vs2))
-	(print (car vs2))
-	(setq vs2 (cdr vs2)))
+    (print (car vs2))
+    (setq vs2 (cdr vs2)))
   vs)
 
 (defun println (&rest vs)
@@ -138,9 +138,9 @@
 
 (defun gcd (a b)
   (while (not (= a b))
-	(if (> a b)
-		(to a (- b))
-		(to b (- a))))
+    (if (> a b)
+        (to a (- b))
+        (to b (- a))))
   a)
 
 (defun lcm (a b)
@@ -155,26 +155,26 @@
 (defun length (list)
   (var i 0)
   (while (not (null? list))
-	(to list (cdr))
+    (to list (cdr))
     (to i (1+)))
   i)
 
 (defun nreverse (list)
   (var reversed-list ())
   (while (not (null? list))
-	(setq reversed-list (cons (car list)
-							  reversed-list))
-	(to list (cdr)))
+    (setq reversed-list (cons (car list)
+                              reversed-list))
+    (to list (cdr)))
   reversed-list)
 
 (defun max (&rest values)
   (var max-value (first values))
   (pop values)
   (while (not (null? values))
-		 (var value (first values))
-		 (when (> value max-value)
-		   (setq max-value value))
-		 (pop values))
+         (var value (first values))
+         (when (> value max-value)
+           (setq max-value value))
+         (pop values))
   max-value)
 
 (defun sort-descending (list)
@@ -187,92 +187,92 @@
   (= (type-of value) duckLisp-object-type-int))
 
 (comment (defun type-to-string (type)
-		   (switch type
-				   duckLisp-object-type-none "none"
-				   duckLisp-object-type-bool "bool"
-				   duckLisp-object-type-int "int"
-				   duckLisp-object-type-float "float"
-				   duckLisp-object-type-str "str"
-				   duckLisp-object-type-list "list"
-				   duckLisp-object-type-symbol "sym"
-				   duckLisp-object-type-function "func"
-				   duckLisp-object-type-closure "clos")))
+           (switch type
+                   duckLisp-object-type-none "none"
+                   duckLisp-object-type-bool "bool"
+                   duckLisp-object-type-int "int"
+                   duckLisp-object-type-float "float"
+                   duckLisp-object-type-str "str"
+                   duckLisp-object-type-list "list"
+                   duckLisp-object-type-symbol "sym"
+                   duckLisp-object-type-function "func"
+                   duckLisp-object-type-closure "clos")))
 
 (defun type-to-string (type)
   (if (= type duckLisp-object-type-none)
-	  "none"
-	  (if (= type duckLisp-object-type-bool)
-		  "bool"
-		  (if (= type duckLisp-object-type-int)
-			  "int"
-			  (if (= type duckLisp-object-type-float)
-				  "float"
-				  (if (= type duckLisp-object-type-str)
-					  "str"
-					  (if (= type duckLisp-object-type-list)
-						  "list"
-						  (if (= type duckLisp-object-type-symbol)
-							  "sym"
-							  (if (= type duckLisp-object-type-function)
-								  "func"
-								  (if (= type duckLisp-object-type-closure)
-									  "clos"
-									  "Invalid type"))))))))))
+      "none"
+      (if (= type duckLisp-object-type-bool)
+          "bool"
+          (if (= type duckLisp-object-type-int)
+              "int"
+              (if (= type duckLisp-object-type-float)
+                  "float"
+                  (if (= type duckLisp-object-type-str)
+                      "str"
+                      (if (= type duckLisp-object-type-list)
+                          "list"
+                          (if (= type duckLisp-object-type-symbol)
+                              "sym"
+                              (if (= type duckLisp-object-type-function)
+                                  "func"
+                                  (if (= type duckLisp-object-type-closure)
+                                      "clos"
+                                      "Invalid type"))))))))))
 
 (defun and (a b)
   (if a
-	  (if b
-		  true
-		  false)
-	  false))
+      (if b
+          true
+          false)
+      false))
 
 (defun or (a b)
   (if a
-	  true
-	  (if b
-		  true
-		  false)))
+      true
+      (if b
+          true
+          false)))
 
 (defun atom? (v)
   (or (not (= (type-of v) duckLisp-object-type-list))
-	  (null? v)))
+      (null? v)))
 
 (defun subst (x y z)
   (if (atom? z)
-	  (if (= z y)
-		  x
-		  z)
-	  (cons (self x y (car z))
-			(self x y (cdr z)))))
+      (if (= z y)
+          x
+          z)
+      (cons (self x y (car z))
+            (self x y (cdr z)))))
 
 (defun pair (x y)
   (if (and (null? x) (null? y))
-	  ()
-	  (if (and (not (atom? x)) (not (atom? y)))
-		  (cons (cons (car x) (cons (car y) ()))
-				(self (cdr x) (cdr y)))
-		  ())))
+      ()
+      (if (and (not (atom? x)) (not (atom? y)))
+          (cons (cons (car x) (cons (car y) ()))
+                (self (cdr x) (cdr y)))
+          ())))
 
 (defun assoc (x y)
   (var duckLisp-object-type-list 5)
   (if (not (null? y))
-	  (if (= (car (car y)) x)
-		  (car (cdr (car y)))
-		  (self x (cdr y)))
-	  ()))
+      (if (= (car (car y)) x)
+          (car (cdr (car y)))
+          (self x (cdr y)))
+      ()))
 
 (defun nthcdr (n list)
   (var i 0)
   (while (< i n)
-	(to list (cdr))
-	(to i (1+)))
+    (to list (cdr))
+    (to i (1+)))
   list)
 
 (defun nth (n list)
   (var i 0)
   (while (< i n)
-	(to list (cdr))
-	(to i (1+)))
+    (to list (cdr))
+    (to i (1+)))
   (car list))
 
 (defun elt (list n)
@@ -284,49 +284,49 @@
 (defun append (list1 list2)
   (var appended-list ())
   (while (not (null? list1))
-	(setq appended-list (cons (car list1)
-							  appended-list))
-	(to list1 (cdr)))
+    (setq appended-list (cons (car list1)
+                              appended-list))
+    (to list1 (cdr)))
   (while (not (null? list2))
-	(setq appended-list (cons (car list2)
-							  appended-list))
-	(to list2 (cdr)))
+    (setq appended-list (cons (car list2)
+                              appended-list))
+    (to list2 (cdr)))
   (nreverse appended-list))
 
 (defun copy-list (list)
   (var new-list ())
   (while (not (null? list))
-		 (setq new-list (cons (car list) new-list))
-		 (to list (cdr)))
+         (setq new-list (cons (car list) new-list))
+         (to list (cdr)))
   (nreverse new-list))
 
 (defun member (element list)
   (var found false)
   (while (and (not (null? list)) (not found))
-	(if (= element (car list))
-		(setq found true)
-	    ())
-	(to list (cdr)))
+    (if (= element (car list))
+        (setq found true)
+        ())
+    (to list (cdr)))
   found)
 
 (defun remove-if (fun list)
   (unless (null? list)
-	  (if (fun (car list))
-		  (self fun (cdr list))
-		  (cons (car list)
-				(self fun (cdr list))))))
+      (if (fun (car list))
+          (self fun (cdr list))
+          (cons (car list)
+                (self fun (cdr list))))))
 
 (defun remove-if-not (fun list)
   (unless (null? list)
-	  (if (not (fun (car list)))
-		  (self fun (cdr list))
-		  (cons (car list)
-				(self fun (cdr list))))))
+      (if (not (fun (car list)))
+          (self fun (cdr list))
+          (cons (car list)
+                (self fun (cdr list))))))
 
 (defun maplist (fun list)
   (unless (null? list)
-	  (cons (fun list) (self fun (cdr list)))))
+      (cons (fun list) (self fun (cdr list)))))
 
 (defun mapcar (fun list)
   (unless (null? list)
-	(cons (fun (car list)) (self fun (cdr list)))))
+    (cons (fun (car list)) (self fun (cdr list)))))
