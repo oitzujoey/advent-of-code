@@ -15,7 +15,9 @@
 (defun result (result)
   (println "Result: " result))
 
-(var input (if release
-               (include "input")
-               (include "example")))
-(println "Input: " input)
+(var input ())
+(defmacro get-input (release)
+  (list (list (quote setq) (quote input) (list (quote if) release
+											  (list (quote include) "input")
+											  (list (quote include) "example")))
+		(list (quote println) "Input: " (quote input))))

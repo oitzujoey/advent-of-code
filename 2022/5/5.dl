@@ -1,0 +1,82 @@
+(include "../aoclib.dl")
+
+(part 1)
+
+(defmacro move (number FROM source TO dest)
+  (list (quote list) number source dest))
+
+(get-input true)
+
+(var stacks (first input))
+(var instructions (second input))
+(setq input ())
+
+(setq stacks (transpose stacks))
+(setq stacks (mapcar* (lambda (stack)
+						(while (null? (car stack))
+							   (pop stack))
+						stack)
+					  stacks))
+
+(var stacks-copy (mapcar* (lambda (stack)
+							(mapcar* identity stack))
+						  stacks))
+
+(println "Stacks:")
+(mapcar* println stacks)
+(println "Instructions:")
+(mapcar* println instructions)
+
+(mapcar* (lambda (instruction)
+		   (var num-crates (first instruction))
+		   (var source (1- (second instruction)))
+		   (var destination (1- (third instruction)))
+		   (var i 0)
+		   (while (< i num-crates)
+				  (var source-stack-cdr (nthcdr source stacks-copy))
+				  (var source-stack (car source-stack-cdr))
+				  (var crate (car source-stack))
+				  (pop source-stack)
+				  (set-car source-stack-cdr source-stack)
+				  (var destination-stack-cdr (nthcdr destination stacks-copy))
+				  (var destination-stack (first destination-stack-cdr))
+				  (push crate destination-stack)
+				  (set-car destination-stack-cdr destination-stack)
+				  (inc i)))
+		 instructions)
+
+(println "Final stacks:")
+(mapcar* println stacks-copy)
+
+(result (mapcar* first stacks-copy))
+
+
+(part 2)
+
+(setq stacks-copy (mapcar* (lambda (stack)
+							 (mapcar* identity stack))
+						   stacks))
+
+(mapcar* (lambda (instruction)
+		   (var num-crates (first instruction))
+		   (var source (1- (second instruction)))
+		   (var destination (1- (third instruction)))
+
+		   (var source-stack-cdr (nthcdr source stacks-copy))
+		   (var source-stack (car source-stack-cdr))
+		   (var crates (copy-list source-stack))
+		   (set-cdr (nthcdr (1- num-crates) crates) ())
+		   (println crates)
+		   (setq source-stack (nthcdr num-crates source-stack))
+		   (set-car source-stack-cdr source-stack)
+
+		   (var destination-stack-cdr (nthcdr destination stacks-copy))
+		   (var destination-stack (first destination-stack-cdr))
+		   (setq destination-stack (append crates destination-stack))
+		   (set-car destination-stack-cdr destination-stack))
+		 instructions)
+
+(println "Final stacks:")
+(mapcar* println stacks-copy)
+
+(result (mapcar* first stacks-copy))

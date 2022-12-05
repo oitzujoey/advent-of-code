@@ -1,8 +1,8 @@
-(var release true)
-
 (include "../aoclib.dl")
 
 (part 1)
+
+(get-input true)
 
 (var paired (mapcar (lambda (group)
                       (var left (list (first group) (second group)))

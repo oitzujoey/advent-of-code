@@ -150,7 +150,10 @@
   (list (quote setq) variable (list (quote cons) value variable)))
 
 (defmacro pop (variable)
-  (list (quote setq) variable (list (quote cdr) variable)))
+  (list
+   (list (quote var) (quote temp) (list (quote car) variable))
+   (list (quote setq) variable (list (quote cdr) variable))
+   (quote temp)))
 
 (defun length (list)
   (var i 0)
@@ -219,19 +222,19 @@
                                       "clos"
                                       "Invalid type"))))))))))
 
-(defun and (a b)
-  (if a
-      (if b
-          true
-          false)
-      false))
+(defmacro and (&rest args)
+  (if args
+	  (list (quote if) (car args)
+			(apply self (cdr args))
+			false)
+	  true))
 
-(defun or (a b)
-  (if a
-      true
-      (if b
-          true
-          false)))
+(defmacro or (&rest args)
+  (if args
+	  (list (quote if) (car args)
+			true
+			(apply self (cdr args)))
+	  false))
 
 (defun atom? (v)
   (or (not (= (type-of v) duckLisp-object-type-list))
@@ -327,6 +330,51 @@
   (unless (null? list)
       (cons (fun list) (self fun (cdr list)))))
 
-(defun mapcar (fun list)
+(defun mapcar* (fun list)
   (unless (null? list)
     (cons (fun (car list)) (self fun (cdr list)))))
+
+(defun transpose (lists)
+  (comment The operation I've feared doing to linked lists.)
+  (comment Create the frame of the transposed matrix.)
+  (var new-lists (mapcar* (lambda (element)
+							(mapcar* (lambda (element) ()) lists))
+						  (first lists)))
+  (comment Populate the matrix.)
+  (var x 0)
+  (while lists
+		 (var list (first lists))
+		 (var y 0)
+		 (while list
+				(var element (first list))
+				(set-car (nthcdr x (nth y new-lists)) element)
+				(pop list)
+				(to y (1+)))
+		 (pop lists)
+		 (to x (1+)))
+  new-lists)
+
+(defmacro inc (variable)
+  (list (quote to) variable (list (quote 1+))))
+(defmacro dec (variable)
+  (list (quote to) variable (list (quote 1-))))
+
+(defun dolist (bind &rest body)
+  (defun nreverse (list)
+	(var reversed-list ())
+	(while (not (null? list))
+		   (setq reversed-list (cons (car list)
+									 reversed-list))
+		   (to list (cdr)))
+	reversed-list)
+  (var variable (car bind))
+  (var l (car (car bind)))
+  (var return (car (car (car bind))))
+  (setq body (nreverse (cons (list (quote pop) l)
+							 (nreverse body))))
+  (list
+   (cons (quote while) (cons l
+							 (cons (list (quote var) variable (list (quote first) l))
+								   
+								   body)))
+   return))
