@@ -151,9 +151,9 @@
 
 (defmacro pop (variable)
   (list
-   (list (quote var) (quote temp) (list (quote car) variable))
+   (list (quote var) (quote pop-temp) (list (quote car) variable))
    (list (quote setq) variable (list (quote cdr) variable))
-   (quote temp)))
+   (quote pop-temp)))
 
 (defun length (list)
   (var i 0)
@@ -359,7 +359,7 @@
 (defmacro dec (variable)
   (list (quote to) variable (list (quote 1-))))
 
-(defun dolist (bind &rest body)
+(defmacro dolist (bind &rest body)
   (defun nreverse (list)
 	(var reversed-list ())
 	(while (not (null? list))
@@ -368,13 +368,15 @@
 		   (to list (cdr)))
 	reversed-list)
   (var variable (car bind))
-  (var l (car (car bind)))
-  (var return (car (car (car bind))))
-  (setq body (nreverse (cons (list (quote pop) l)
+  (var l (car (cdr bind)))
+  (var return (car (cdr (cdr bind))))
+  (setq body (nreverse (cons (list (quote pop) (quote dolist-temp))
 							 (nreverse body))))
   (list
-   (cons (quote while) (cons l
-							 (cons (list (quote var) variable (list (quote first) l))
+   (list (quote var) (quote dolist-temp) l)
+   (list (quote var) variable ())
+   (cons (quote while) (cons (quote dolist-temp)
+							 (cons (list (quote setq) variable (list (quote first) (quote dolist-temp)))
 								   
 								   body)))
    return))

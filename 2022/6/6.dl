@@ -1,0 +1,29 @@
+(include "../aoclib.dl")
+
+(part 1)
+
+(get-input true)
+
+(defun n-not-equal (list n)
+  (var first-n (copy-list list))
+  (set-cdr (nthcdr (1- n) first-n) ())
+  (apply != first-n))
+
+
+(defun find-first-n (n)
+  (var i (1- n))
+  (var list input)
+  (var found false)
+  (while (and (fourth list) (not found))
+         (when (n-not-equal list n)
+           (setq found true))
+         (inc i)
+         (pop list))
+  i)
+
+(result (find-first-n 4))
+
+
+(part 2)
+
+(result (find-first-n 14))
