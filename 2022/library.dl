@@ -8,6 +8,7 @@
 (var duckLisp-object-type-symbol 6)
 (var duckLisp-object-type-function 7)
 (var duckLisp-object-type-closure 8)
+(var duckLisp-object-type-vector 9)
 
 (comment " Copied straight out of CLHS B）")
 
@@ -170,6 +171,16 @@
     (to list (cdr)))
   reversed-list)
 
+(defun min (&rest values)
+  (var min-value (first values))
+  (pop values)
+  (while (not (null? values))
+         (var value (first values))
+         (when (< value min-value)
+           (setq min-value value))
+         (pop values))
+  min-value)
+
 (defun max (&rest values)
   (var max-value (first values))
   (pop values)
@@ -188,6 +199,9 @@
 
 (defun integer? (value)
   (= (type-of value) duckLisp-object-type-int))
+
+(defun list? (value)
+  (= (type-of value) duckLisp-object-type-list))
 
 (comment (defun type-to-string (type)
            (switch type
@@ -256,12 +270,11 @@
                 (self (cdr x) (cdr y)))
           ())))
 
-(defun assoc (x y)
-  (var duckLisp-object-type-list 5)
-  (if (not (null? y))
-      (if (= (car (car y)) x)
-          (car (cdr (car y)))
-          (self x (cdr y)))
+(defun assoc (item alist)
+  (if (not (null? alist))
+      (if (= (car (car alist)) item)
+          (car alist)
+          (self item (cdr alist)))
       ()))
 
 (defun nthcdr (n list)
@@ -334,6 +347,12 @@
   (unless (null? list)
     (cons (fun (car list)) (self fun (cdr list)))))
 
+(defun filter* (fun list)
+  (unless (null? list)
+    (if (fun (car list))
+        (cons (car list) (self fun (cdr list)))
+        (self fun (cdr list)))))
+
 (defun transpose (lists)
   (comment The operation I've feared doing to linked lists.)
   (comment Create the frame of the transposed matrix.)
@@ -380,3 +399,13 @@
 								   
 								   body)))
    return))
+
+(defun subseq (sequence start &rest end)
+  (setq sequence (nthcdr start sequence))
+  (when end
+	(setq end (- (car end) start)))
+  (if (and sequence (if end (!= end 0) true))
+	  (cons (car sequence) (if end
+							   (self (cdr sequence) 0 (1- end))
+							   (self (cdr sequence) 0)))
+	  ()))
