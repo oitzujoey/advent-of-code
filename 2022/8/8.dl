@@ -1,0 +1,174 @@
+(include "../aoclib.dl")
+
+(comment My current strategy is to have two buffers. The first buffer will be the input, which is already in the format
+         I'd like it in. The second buffer will be the visibility buffer. To check if a tree is visible, we will trace a
+         path from the left side to the right. For every tree, the record height of all the visited trees will be set so
+         that we can tell if the current tree is visible or not. If the tree is visible, change the value in the
+         visibility buffer to one. The default value of the visibility buffer should be zero.
+         Once all of the above is done, reverse the horizontal order of the buffer and repeat.
+         Once that is done, transpose the buffer and repeat.
+         Once that is done, reverse the horizontal order of the buffer and repeat.
+         Sum every number in the visibility buffer.
+
+         We will touch some trees multiple times.)
+
+(part 1)
+
+(get-input true)
+
+(println "Width:  " (length (first input)))
+(println "Height: " (length input))
+
+(defun square-matrix (dimension fill)
+  (var matrix ())
+  (var x 0)
+  (while (< x dimension)
+         (var list ())
+         (var y 0)
+         (while (< y dimension)
+                (push fill list)
+                (inc y))
+         (push list matrix)
+         (inc x))
+  matrix)
+
+(var visible (square-matrix (length input) 0))
+
+(defun merge-matrices (matrix1 matrix2 merge-function)
+  (var merged-matrix ())
+  (while matrix1
+         (var row1 (first matrix1))
+         (var row2 (first matrix2))
+         (var merged-row ())
+         (while row1
+                (var element1 (first row1))
+                (var element2 (first row2))
+                (push (merge-function element1 element2) merged-row)
+                (pop row1)
+                (pop row2))
+         (push (nreverse merged-row) merged-matrix)
+         (pop matrix1)
+         (pop matrix2))
+  (nreverse merged-matrix))
+
+(defun print-matrix (matrix)
+  (dolist (row matrix)
+    (dolist (element row)
+      (print element))
+    (println))
+  (println))
+
+(defun do-for-every-side (flood-function merge-function)
+  (defun flood-visibility-buffer-with ()
+    (setq visible (merge-matrices (flood-function)
+                                  visible
+                                  merge-function)))
+  (defun mirror-buffers-along-y ()
+    (defun mirror-matrix-along-y (matrix)
+      (var mirrored-matrix ())
+      (dolist (row matrix (nreverse mirrored-matrix))
+        (push (nreverse row) mirrored-matrix)))
+    (setq input (mirror-matrix-along-y input))
+    (setq visible (mirror-matrix-along-y visible)))
+  (defun transpose-buffers ()
+    (setq input (transpose input))
+    (setq visible (transpose visible)))
+
+  (flood-visibility-buffer-with)
+  (mirror-buffers-along-y)
+  (flood-visibility-buffer-with)
+  (mirror-buffers-along-y)
+  (transpose-buffers)
+  (flood-visibility-buffer-with)
+  (mirror-buffers-along-y)
+  (flood-visibility-buffer-with)
+  (mirror-buffers-along-y)
+  (transpose-buffers))
+
+(defun flood-with-light ()
+  (var visibility-matrix ())
+  (dolist (row input)
+    (var max-height -1)
+    (var visibility-list ())
+    (dolist (element row)
+      (push (if (> element max-height) 1 0) visibility-list)
+      (to max-height (max element)))
+    (push (nreverse visibility-list) visibility-matrix))
+  (nreverse visibility-matrix))
+
+(print-matrix input)
+
+(do-for-every-side flood-with-light (lambda (first second)
+                                      (if first 1 (if second 1 0))))
+
+(print-matrix (merge-matrices input visible (lambda (input visible)
+                                              (if visible input "."))))
+(print-matrix (merge-matrices input visible (lambda (input visible)
+                                              (if visible "." input))))
+
+(var count 0)
+(mapcar* (lambda (row)
+           (mapcar* (lambda (element)
+                      (to count (+ element)))
+                    row))
+         visible)
+(result count)
+
+
+(part 2)
+
+(comment Part 2 will be like part 1, but the visibility matrix will instead contain the running product of the
+         visibility. The matrix is initialized to 1 since it's a product. The same reverse-transpose process will be
+         done for this part as well. instead of casting rays from the edges, this time the rays will be cast by every
+         tree.)
+
+(comment Trim map down to 97×97 to use a bit less memory.)
+(comment
+ (setq input (cdr input))
+ (setq input (nreverse (cdr (nreverse input))))
+ (setq input (transpose input))
+ (setq input (cdr input))
+ (setq input (nreverse (cdr (nreverse input))))
+ (setq input (transpose input)))
+(print-matrix input)
+
+(defun mapmatrix* (function matrix)
+  (mapcar* (lambda (row)
+               (mapcar* function row))
+           matrix))
+
+(defun flood-with-light-for-every-tree ()
+  (var visibility-matrix ())
+  (dolist (row input)
+    (var visibility-list ())
+    (while row
+           (push (
+                  (var max-height (first row))
+                  (var distance 0)
+                  (var subrow (cdr row))
+                  (while (and subrow (> (first row) (first subrow)))
+                         (inc distance)
+                         (pop subrow))
+                  (when (and subrow (not (> (first row) (first subrow))))
+                    (inc distance))
+                  distance)
+                 visibility-list)
+           (pop row))
+    (push (nreverse visibility-list) visibility-matrix))
+  (println "input")
+  (mapcar* println input)
+  (println "visibility")
+  (mapcar* println (nreverse visibility-matrix))
+  (println "visible")
+  (mapcar* println visible) (println)
+  (nreverse visibility-matrix))
+
+(setq visible (square-matrix (length input) 1))
+
+(do-for-every-side flood-with-light-for-every-tree (lambda (first second) (* first second)))
+(mapcar* println input) (println)
+(mapcar* println visible)
+
+(result (apply max (mapcar* (lambda (row)
+                              (apply max row))
+                            visible)))
