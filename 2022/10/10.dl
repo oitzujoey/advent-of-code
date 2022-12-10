@@ -1,0 +1,83 @@
+(include "../aoclib.dl")
+
+(part 1)
+
+(var cycle 0)
+(var X 0)
+
+(var interesting-signal-strengths ())
+
+(var cycle-increment-tasks ())
+
+(defun on-posedge-cycle (function)
+  (push function cycle-increment-tasks))
+
+(defun increment-cycle ()
+  (dolist (cycle-increment-task cycle-increment-tasks)
+    (cycle-increment-task cycle))
+  (inc cycle))
+
+(defun reset ()
+  (setq X 1)
+  (setq cycle 0))
+
+(on-posedge-cycle
+ (lambda (cycle)
+   (when (= (mod (+ cycle 20) 40) 0)
+     (push (* X cycle) interesting-signal-strengths))))
+
+(defun addx (v)
+  (increment-cycle)
+  (increment-cycle)
+  (to X (+ v)))
+
+(defun noop ()
+  (increment-cycle))
+
+(get-input true)
+
+(result (apply + interesting-signal-strengths))
+
+
+(part 2)
+
+(var lit "█")
+(var dark " ")
+(var width 40)
+(var height 6)
+(var num-pixels (* width height))
+(var screen (make-vector num-pixels dark))
+
+(defun in-range? (value min-bound max-bound)
+  (and (<= min-bound value) (<= value max-bound)))
+
+(defun bool-to-pixel (bool)
+  (if bool lit dark))
+
+(defun hard-reset ()
+  (reset)
+  (setq interesting-signal-strengths ())
+  (setq cycle-increment-tasks ()))
+
+(hard-reset)
+
+(on-posedge-cycle
+ (lambda (cycle)
+   (when (< cycle num-pixels)
+     (set-vector-element screen cycle (bool-to-pixel (in-range? (mod cycle width) (1- X) (1+ X)))))))
+
+(reset)
+
+(get-input true)
+
+(
+ (var y 0)
+ (while (< y height)
+   (var x 0)
+   (while (< x width)
+     (print (get-vector-element screen (+ (* y width) x)))
+     (inc x))
+   (println)
+   (inc y)))
+
+(result ())
