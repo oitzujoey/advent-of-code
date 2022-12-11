@@ -7,6 +7,13 @@
          (pop values))
   sum)
 
+(defun * (&rest values)
+  (var product 1)
+  (while values
+         (to product (* (first values)))
+         (pop values))
+  product)
+
 (defun = (&rest values)
   (var equal true)
   (var first-value (pop values))

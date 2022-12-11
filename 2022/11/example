@@ -1,0 +1,28 @@
+(vector
+ (quote (monkey 0
+                (starting-items 79 98)
+                (operation (* old 19))
+                (test 23)
+                (if-true 2)
+                (if-false 3)))
+
+ (quote (monkey 1
+                (starting-items 54 65 75 74)
+                (operation (+ old 6))
+                (test 19)
+                (if-true 2)
+                (if-false 0)))
+
+ (quote (monkey 2
+                (starting-items 79 60 97)
+                (operation (* old old))
+                (test 13)
+                (if-true 1)
+                (if-false 3)))
+
+ (quote (monkey 3
+                (starting-items 74)
+                (operation (+ old 3))
+                (test 17)
+                (if-true 0)
+                (if-false 1))))

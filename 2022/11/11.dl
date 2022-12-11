@@ -1,0 +1,122 @@
+(include "../aoclib.dl")
+
+(part 1)
+
+(get-input true)
+
+(var monkeys (make-vector (length input) ()))
+
+(defun make-monkey (init)
+  (var id (second init))
+  (var starting-items (cdr (third init)))
+  (var operation (cadr (fourth init)))
+  (var test (cadr (fifth init)))
+  (var if-true (cadr (sixth init)))
+  (var if-false (cadr (seventh init)))
+  (list (cons (quote id) id)
+        (cons (quote items) starting-items)
+        (cons (quote operation) (
+                                 (var function (if (= (first operation) (quote +)) + *))
+                                 (var arg1 (second operation))
+                                 (var arg2 (third operation))
+                                 (lambda (old) (function (if (= arg1 (quote old)) old arg1)
+                                                         (if (= arg2 (quote old)) old arg2)))))
+        (cons (quote test) test)
+        (cons (quote next) (lambda (condition) (if condition if-true if-false)))
+        (cons (quote iterations) 0)))
+
+(comment (
+ (var i 0)
+ (var input2 input)
+ (while input2
+   (set-vector-element monkeys i (make-monkey (first input2)))
+   (inc i)
+   (pop input2))))
+
+(defun make-get-field (monkey)
+  (lambda (field)
+    (assoc field monkey)))
+(defun make-set-field (monkey)
+  (lambda (field value)
+    (set-cdr (assoc field monkey) value)))
+
+(defun do-monkey (monkey-ref decay)
+  (var monkey (deref monkey-ref))
+  (var id ())
+  (var items ())
+  (var operation ())
+  (var test ())
+  (var next-function ())
+  (var iterations ())
+  (
+   (var get-field (make-get-field monkey))
+   (setq id (cdr (get-field (quote id))))
+   (setq items (cdr (get-field (quote items))))
+   (setq operation (cdr (get-field (quote operation))))
+   (setq test (cdr (get-field (quote test))))
+   (setq next-function (cdr (get-field (quote next))))
+   (setq iterations (cdr (get-field (quote iterations)))))
+  (
+   (while items
+     (var worry (decay (operation (car items))))
+     (var next (next-function (= (mod worry test) 0)))
+     (var next-monkey (get-vector-element monkeys next))
+     (
+      (var next-items ())
+      (
+       (var get-field (make-get-field next-monkey))
+       (setq next-items (cdr (get-field (quote items)))))
+      (to next-items (append (list worry)))
+      (
+       (var set-field (make-set-field next-monkey))
+       (set-field (quote items) next-items)))
+     (inc iterations)
+     (pop items)))
+  (
+   (var set-field (make-set-field monkey))
+   (comment I think this will always be nil.)
+   (set-field (quote items) items)
+   (set-field (quote iterations) iterations))
+  (set-deref monkey-ref monkey))
+
+(comment (
+ (var i 0)
+ (while (< i 20)
+   (dolist (monkey monkeys)
+     (do-monkey (ref monkey) (lambda (value) (/ value 1))))
+   (inc i))))
+
+(defun calculate-result ()
+  (var iterationss ())
+  (dolist (monkey monkeys)
+    (var get-field (make-get-field monkey))
+    (push (cdr (get-field (quote iterations))) iterationss))
+  (println (nreverse iterationss))
+  (to iterationss (sort-descending))
+  (set-cdr (cdr iterationss) ())
+  (apply * iterationss))
+
+(comment (result (calculate-result)))
+
+
+(part 2)
+
+(comment (get-input true))
+
+(
+ (var i 0)
+ (while input
+   (set-vector-element monkeys i (make-monkey (first input)))
+   (inc i)
+   (pop input)))
+
+(
+ (var i 10000)
+ (while (> i 0)
+   (when (= 0 (mod i 1000)) (println i))
+   (dolist (monkey monkeys)
+     (do-monkey (ref monkey) (lambda (v) (mod v (if false (* 23 19 13 17) (* 5 2 13 7 19 11 3 17))))))
+   (dec i)))
+
+
+(result (calculate-result))
