@@ -434,7 +434,7 @@
       (while (and entries (not found))
              (var entry (first entries))
              (when (equal? (car entry) key)
-               (setq found (car entry)))
+               (setq found (cdr entry)))
              (pop entries))
       found)
     (defun set-hash (key value)

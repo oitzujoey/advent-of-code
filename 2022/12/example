@@ -1,0 +1,5 @@
+(vector (vector S a b q p o n m)
+        (vector a b c r y x x l)
+        (vector a c c s z E x k)
+        (vector a c c t u v w j)
+        (vector a b d e f g h i))
