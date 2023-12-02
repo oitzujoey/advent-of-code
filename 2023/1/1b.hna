@@ -1,0 +1,70 @@
+(include "../aoclib.hna")
+
+var f open-file "input" "r"
+
+var zero "zero"
+var one "one"
+var two "two"
+var three "three"
+var four "four"
+var five "five"
+var six "six"
+var seven "seven"
+var eight "eight"
+var nine "nine"
+var ten "ten"
+
+var keywords (vector zero one two three four five six seven eight nine
+                     ascii-0 ascii-1 ascii-2 ascii-3 ascii-4 ascii-5 ascii-6 ascii-7 ascii-8 ascii-9)
+var english-lookup (vector cons zero 0
+                           cons one 1
+                           cons two 2
+                           cons three 3
+                           cons four 4
+                           cons five 5
+                           cons six 6
+                           cons seven 7
+                           cons eight 8
+                           cons nine 9)
+
+(defun getdigit line
+  var result false
+  (dolist keyword keywords
+          (when integer? keyword
+                setq keyword make-string (list keyword))
+          (when startswith keyword line
+                setq result keyword))
+  result)
+
+(defun collect-numbers-in-line line
+  var digits nil
+  (while < 0 length line
+         var digit getdigit line
+         (when digit
+               push digit digits)
+         setq line cdr line)
+  digits)
+
+(defun digit-to-integer string
+  (if = 1 length string
+      (- car string
+         ascii-0)
+      (()
+       var integer nil
+       (dolist word english-lookup
+               (when = string car word
+                     setq integer cdr word))
+       integer)))
+
+var line nil
+var sum 0
+(while (!= EOF (setq line (getline f)))
+  var digits collect-numbers-in-line line
+  var last-digit-string first digits
+  var first-digit-string first last digits
+  var last-digit digit-to-integer last-digit-string
+  var first-digit digit-to-integer first-digit-string
+  var integer (+ * 10 first-digit
+                 last-digit)
+  (incq sum integer))
+println sum

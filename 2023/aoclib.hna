@@ -1,0 +1,37 @@
+(include "../library.hna")
+
+;; Characters
+
+var EOF -1
+
+var ascii-0 car "0"
+var ascii-1 car "1"
+var ascii-2 car "2"
+var ascii-3 car "3"
+var ascii-4 car "4"
+var ascii-5 car "5"
+var ascii-6 car "6"
+var ascii-7 car "7"
+var ascii-8 car "8"
+var ascii-9 car "9"
+var ascii-newline car "\n"
+
+
+(defun getline (file)
+  var char-list ()
+  var char ()
+  (while (and (!= ascii-newline
+                  (setq char (fgetc file)))
+              (!= EOF char))
+         push char char-list)
+  (if = EOF char
+      EOF
+      make-string reverse char-list))
+
+
+(defun startswith (search-term string)
+  (if (< length string
+         length search-term)
+      false
+      (= search-term
+         substring string 0 (length search-term))))

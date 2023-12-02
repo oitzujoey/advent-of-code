@@ -1,0 +1,38 @@
+(include "../library.hna")
+
+var f open-file "input" "r"
+
+var EOF -1
+var current ()
+
+var char-0 car "0"
+var char-9 car "9"
+var char-newline car "\n"
+
+var first-char ()
+var second-char ()
+
+var pairs ()
+
+(defun digit? char
+  (and (<= char-0 char) (<= char char-9)))
+
+(defun char-digit-to-number char
+  - char char-0)
+
+(while (!= EOF (setq current (fgetc f)))
+  (when = char-newline current
+        (when first-char
+          (unless second-char
+            setq second-char first-char)
+          (push (+ * 10 (char-digit-to-number first-char)
+                   char-digit-to-number second-char)
+                pairs))
+        setq first-char ()
+        setq second-char ())
+  (when digit? current
+        (if first-char
+            setq second-char current
+            setq first-char current)))
+
+println (apply #+ pairs)
