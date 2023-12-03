@@ -1,0 +1,134 @@
+(include "../aoclib.hna")
+
+var f open-file "input" "r"
+
+var total-red 12
+var total-green 13
+var total-blue 14
+
+var red "red"
+var green "green"
+var blue "blue"
+
+(defun consume-whitespace (line)
+  (while (or = ascii-space car line
+             = ascii-comma car line)
+         pop line)
+  line)
+
+(defun parse-integer line
+  readint line)
+
+(defun parse-color line
+  var line-length length line
+  (cond startswith red line
+        cons red (substring line (length red) line-length)
+        startswith green line
+        cons green (substring line (length green) line-length)
+        startswith blue line
+        cons blue (substring line (length blue) line-length)))
+
+(defun parse-pair line
+  var result parse-integer line
+  (when result
+    var integer car result
+    setq line cdr result
+    setq line consume-whitespace line
+    setq result parse-color line
+    (when result
+      var color car result
+      setq line cdr result
+      (cons (cons color integer)
+            line))))
+
+(defun parse-semicolon line
+  setq line consume-whitespace line
+  (when (and != "" line
+             = ascii-semicolon car line)
+        setq line cdr line
+        line))
+
+(defun parse-try line
+  var entries nil
+  (while (and != "" line
+              = nil parse-semicolon line)
+         var result parse-pair line
+         (when result
+           var pair car result
+           setq line cdr result
+           push pair entries
+           setq line consume-whitespace line))
+  cons entries line)
+
+(defun parse-game (line)
+  var tries nil
+  var running true
+  (while running
+    
+    setq line consume-whitespace line
+    var result parse-try line
+    (when result
+      var try car result
+      setq line cdr result
+      push try tries
+      setq running (parse-semicolon line)
+      (when running
+        setq line running)))
+  cons tries line)
+
+
+(defun number-for-color color
+  (cond = red color
+        total-red
+        = green color
+        total-green
+        = blue color
+        total-blue))
+
+(defun check-try (try)
+  var good true
+  (dolist entry try
+          var color car entry
+          var number cdr entry
+          (unless <= number number-for-color color
+                  setq good false))
+  good)
+
+(defun minimize-tries tries
+  var red-max-number 0
+  var green-max-number 0
+  var blue-max-number 0
+  (dolist try tries
+          (dolist entry try
+                  var color car entry
+                  var number cdr entry
+                  (switch color
+                          red  setq red-max-number (max number red-max-number)
+                          green  setq green-max-number (max number green-max-number)
+                          blue  setq blue-max-number (max number blue-max-number))))
+  (list cons red red-max-number
+        cons green green-max-number
+        cons blue blue-max-number))
+
+var line nil
+var game-number 1
+var powers nil
+(while != EOF (setq line getline f)
+       var line-length length line
+       var trimmed-line (substring line 5 line-length)
+       (while != ascii-colon car trimmed-line
+              pop trimmed-line)
+       pop trimmed-line  pop trimmed-line
+       var result parse-game trimmed-line
+       var tries nil
+       (if result
+           setq tries car result
+           println "ERROR")
+
+       var minimized (apply #* mapcar #cdr minimize-tries tries)
+       push minimized powers
+
+       incq game-number)
+
+println powers
+println (apply #+ powers)

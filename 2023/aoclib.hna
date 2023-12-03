@@ -2,36 +2,85 @@
 
 ;; Characters
 
-var EOF -1
+bvar EOF -1
 
-var ascii-0 car "0"
-var ascii-1 car "1"
-var ascii-2 car "2"
-var ascii-3 car "3"
-var ascii-4 car "4"
-var ascii-5 car "5"
-var ascii-6 car "6"
-var ascii-7 car "7"
-var ascii-8 car "8"
-var ascii-9 car "9"
-var ascii-newline car "\n"
+bvar ascii-space car " "
+bvar ascii-0 car "0"
+bvar ascii-1 car "1"
+bvar ascii-2 car "2"
+bvar ascii-3 car "3"
+bvar ascii-4 car "4"
+bvar ascii-5 car "5"
+bvar ascii-6 car "6"
+bvar ascii-7 car "7"
+bvar ascii-8 car "8"
+bvar ascii-9 car "9"
+bvar ascii-newline car "\n"
+bvar ascii-colon car ":"
+bvar ascii-comma car ","
+bvar ascii-semicolon car ";"
+
+(bdefun ascii-digit? char
+        (and <= ascii-0 char
+             <= char ascii-9))
+
+(bdefun ascii-digit-value char
+        - char ascii-0)
 
 
-(defun getline (file)
-  var char-list ()
-  var char ()
-  (while (and (!= ascii-newline
-                  (setq char (fgetc file)))
-              (!= EOF char))
-         push char char-list)
-  (if = EOF char
-      EOF
-      make-string reverse char-list))
 
 
-(defun startswith (search-term string)
-  (if (< length string
-         length search-term)
-      false
-      (= search-term
-         substring string 0 (length search-term))))
+(bdefun getline (file)
+        var char-list ()
+        var char ()
+        (while (and (!= ascii-newline
+                        (setq char (fgetc file)))
+                    (!= EOF char))
+          push char char-list)
+        (if = EOF char
+            EOF
+            make-string reverse char-list))
+
+
+(bdefun startswith (search-term string)
+        (if (< length string
+               length search-term)
+            false
+            (= search-term
+               substring string 0 (length search-term))))
+
+(bdefun readint (string)
+        var integer-chars nil
+        var char nil
+        (while (and != "" string
+                    (ascii-digit? (setq char car string)))
+               push char integer-chars
+               pop string)
+
+        var acc 0
+        var power 1
+        (while integer-chars
+          (incq acc (* power (ascii-digit-value (pop integer-chars))))
+          setq power * 10 power)
+        (cons acc string))
+
+(bdefun logical-and (&rest 2 values)
+        var result true
+        (dolist value values
+                (when not value
+                      setq result false))
+        result)
+
+(bdefun min (&rest 2 values)
+        var min car values
+        (dolist value cdr values
+                (when < value min
+                      setq min value))
+        min)
+
+(bdefun max (&rest 2 values)
+        var max car values
+        (dolist value cdr values
+                (when > value max
+                      setq max value))
+        max)
